@@ -180,7 +180,7 @@
                             <a href="#s3" data-toggle="tab">Search History</a>
                         </li>
                         <li class="pull-right hidden-mobile">
-                            <a href="javascript:void(0);"> <span class="note">About 62 results (0.01 seconds) </span> 
+                            <a href="javascript:void(0);"> <span class="note"><span id="record-count-1">0</span> results (<span id="ajax-duration">0.00</span> seconds) </span> 
                             </a>
                         </li>
                     </ul>
@@ -196,22 +196,22 @@
                                             <label class="label">Inline checkboxes</label>
                                             <div class="inline-group">
                                                 <label class="checkbox">
-                                                    <input type="checkbox" name="checkbox-inline" checked="checked">
+                                                    <input type="checkbox" id="search-everything" name="checkbox-inline" checked="checked">
                                                     <i></i>Everything</label>
                                                 <label class="checkbox">
-                                                    <input type="checkbox" name="checkbox-inline">
+                                                    <input type="checkbox" id="search-jsn" name="checkbox-inline">
                                                     <i></i>JSN</label>
                                                 <label class="checkbox">
-                                                    <input type="checkbox" name="checkbox-inline">
+                                                    <input type="checkbox" id="search-nomenclature" name="checkbox-inline">
                                                     <i></i>Nomenclature</label>
                                                 <label class="checkbox">
-                                                    <input type="checkbox" name="checkbox-inline">
+                                                    <input type="checkbox" id="search-vendor" name="checkbox-inline">
                                                     <i></i>Vendor</label>
                                                 <label class="checkbox">
-                                                    <input type="checkbox" name="checkbox-inline">
+                                                    <input type="checkbox" id="search-description" name="checkbox-inline">
                                                     <i></i>Description</label>
                                                 <label class="checkbox">
-                                                    <input type="checkbox" name="checkbox-inline">
+                                                    <input type="checkbox" id="search-logistics" name="checkbox-inline">
                                                     <i></i>Logistics Category</label>
                                             </div>
                                         </section>
@@ -222,12 +222,12 @@
                             <div class="input-group input-group-lg hidden-mobile">
                                 <div class="well well-sm" style="width: 100%;margin-bottom: 0px;">
                                     <div class="input-group">
-                                        <input class="form-control input-lg" type="text" id="fa-icon-search" placeholder="Search for a product...">
-                                        <span class="input-group-addon"><i class="fa fa-fw fa-lg fa-search"></i></span>
+                                        <input class="form-control input-lg" type="text" id="search-value" placeholder="Search for a product...">
+                                        <span class="input-group-addon"><i id="search-button" class="fa fa-fw fa-lg fa-search"></i></span>
                                     </div>
                                 </div>
                             </div>
-                            <h1 class="font-md" style="margin-bottom: 40px;"> Search Results for <span class="semi-bold">Everything</span><small class="text-danger"> &nbsp;&nbsp;(62 results)</small></h1>
+                            <h1 class="font-md" style="margin-bottom: 40px;"> Search Results for <span class="semi-bold">Everything</span><small class="text-danger"> &nbsp;&nbsp;(<span id="record-count-2">0</span> results)</small></h1>
                             <br>
                             <br>
                             <table id="records" class="table table-striped table-bordered table-hover" width="100%">
@@ -329,56 +329,100 @@
 
             $("#search-project").focus();
 
-        });
-        $('#records').dataTable({
-            "serverSide": true,
-            "processing": true,
-            "ajax": {
-                "url": "mockdata.json",
-                "dataSrc": "data",
-                "type": "GET"
-            },
-            "columns": [
-                {
-                    "name": "JSN Link",        "data": "jsn",          "targets": "jsn-link",
-                    "render": function (data, type, full) {
-                        return '<a href="'+data+'">' + data + '</a>';
-                    }
-                },
-                {"name": "Nomenclature",    "data": "nomenclature", "targets": "nomenclature"},
-                {"name": "Description",     "data": "description",  "targets": "description"},
-                {"name": "Price 1",         "data": "price1",       "targets": "price-1"},
-                {"name": "Price 2",         "data": "price2",       "targets": "price-2"},
-                {"name": "Price 3",         "data": "price3",       "targets": "price-3"},
-                {"name": "Mean Price",      "data": "meanPrice",    "targets": "mean-price"},
-                {
-                    "name": "Status",          "data": "isActive",       "targets": "status",
-                    "render": function (data, type, full) {
-                        if (data == true) {
-                            return '<span ng-class="{\'label label-success\': row.isActive, \'label label-danger\': !row.isActive}" class="ng-binding label label-success">Active</span>';
+            var dataTablesAjaxStartTime = undefined;
+            var dataTablesAjaxEndTime = undefined;
+
+            $('#records')
+                .on('preXhr.dt', function ( e, settings, data ) {
+                    dataTablesAjaxStartTime = new Date().getTime();
+                })
+                .on('xhr.dt', function (e, settings, json) {
+                    dataTablesAjaxEndTime = new Date().getTime();
+                    var dataTablesAjaxDuration = dataTablesAjaxEndTime - dataTablesAjaxStartTime;
+                    var recordsFiltered = json.recordsFiltered;
+                    $('#record-count-1').html(recordsFiltered);
+                    $('#record-count-2').html(recordsFiltered);
+                    $('#ajax-duration').html((dataTablesAjaxDuration * .001).toFixed(2));
+                })
+                .dataTable({
+                    "serverSide": true,
+                    "processing": true,
+                    "searching": true,
+                    "ajax": {
+                        "url": "mockdata.json",
+                        "dataSrc": "data",
+                        "type": "GET",
+                        "data": function ( d ) {
+                            var searchColumns = [];
+                            if ($('#search-everything').prop('checked') == true) {
+                                searchColumns.push('everything');
+                            }
+                            if ($('#search-jsn').prop('checked') == true) {
+                                searchColumns.push('jsn');
+                            }
+                            if ($('#search-nomenclature').prop('checked') == true) {
+                                searchColumns.push('nomenclature');
+                            }
+                            if ($('#search-vendor').prop('checked') == true) {
+                                searchColumns.push('vendor');
+                            }
+                            if ($('#search-description').prop('checked') == true) {
+                                searchColumns.push('description');
+                            }
+                            if ($('#search-logistics').prop('checked') == true) {
+                                searchColumns.push('logistics');
+                            }
+                            d.searchColumns = searchColumns.join(",");
                         }
-                        else {
-                            return '<span ng-class="{\'label label-success\': row.isActive, \'label label-danger\': !row.isActive}" class="ng-binding label label-danger">Inactive</span>';
-                        }
+                    },
+                    "columns": [
+                        {
+                            "name": "JSN Link",        "data": "jsn",          "targets": "jsn-link",
+                            "render": function (data, type, full) {
+                                return '<a href="'+data+'">' + data + '</a>';
+                            }
+                        },
+                        {"name": "Nomenclature",    "data": "nomenclature", "targets": "nomenclature"},
+                        {"name": "Description",     "data": "description",  "targets": "description"},
+                        {"name": "Price 1",         "data": "price1",       "targets": "price-1"},
+                        {"name": "Price 2",         "data": "price2",       "targets": "price-2"},
+                        {"name": "Price 3",         "data": "price3",       "targets": "price-3"},
+                        {"name": "Mean Price",      "data": "meanPrice",    "targets": "mean-price"},
+                        {
+                            "name": "Status",          "data": "isActive",       "targets": "status",
+                            "render": function (data, type, full) {
+                                if (data == true) {
+                                    return '<span ng-class="{\'label label-success\': row.isActive, \'label label-danger\': !row.isActive}" class="ng-binding label label-success">Active</span>';
+                                }
+                                else {
+                                    return '<span ng-class="{\'label label-success\': row.isActive, \'label label-danger\': !row.isActive}" class="ng-binding label label-danger">Inactive</span>';
+                                }
+                            }
+                        },
+                        {"name": "Last Modified",   "data": "lastModified", "targets": "last-modified"}
+                    ],
+                    "dom": 'T<"clear">lfrtip',
+                    "tableTools": {
+                        "sSwfPath": "js/datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf",
+                        "aButtons": [
+                            "copy",
+                            "print",
+                            {
+                                "sExtends":    "collection",
+                                "sButtonText": "Save",
+                                "aButtons":    [ "csv", "xls", "pdf" ]
+                            }
+                        ]
                     }
-                },
-                {"name": "Last Modified",   "data": "lastModified", "targets": "last-modified"}
-            ],
-            "dom": 'T<"clear">lfrtip',
-            "tableTools": {
-                "sSwfPath": "js/datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf",
-                "aButtons": [
-                    "copy",
-                    "print",
-                    {
-                        "sExtends":    "collection",
-                        "sButtonText": "Save",
-                        "aButtons":    [ "csv", "xls", "pdf" ]
-                    }
-                ]
-            }
+                }); // eo datatable
+            var datatable = $('#records').DataTable();
+            $('#search-button').on( 'click', function () {
+                var searchString = $('#search-value').val();
+                datatable.search(searchString).draw();
+            });
+            // hide the default dataTables search box so we can use our custom box (see element "search-value")
+            $('#records_filter').hide();
         });
     </script>
 </body>
-
 </html>
