@@ -1,0 +1,16 @@
+{
+  "version": "0.0.0",
+  "name": "navbar",
+  "repo": "max/navbar",
+  "license": "MIT",
+  "dependencies": {},
+  "description": "Your-description",
+  "keywords": [],
+  "main": "index.js",
+  "scripts": [
+    "index.js"
+  ],
+  "styles": [],
+  "images": [],
+  "files": []
+}

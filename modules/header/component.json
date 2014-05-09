@@ -1,0 +1,18 @@
+{
+  "version": "0.0.0",
+  "name": "header",
+  "repo": "max/header",
+  "license": "MIT",
+  "dependencies": {},
+  "description": "Your-description",
+  "keywords": [],
+  "main": "index.js",
+  "scripts": [
+    "index.js",
+    "controllers/header.js",
+    "config.js"
+  ],
+  "styles": [],
+  "images": [],
+  "files": []
+}
