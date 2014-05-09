@@ -1,12 +1,11 @@
 /**
- * @ngdoc max.directives
- * @name max.datatables:
- * @description AngularJs directive for jQuery datatables
+ * @name max.datatables.directive
+ *
+ * @description Integration of jQuery DataTables plugin.
  * @author Jeremy Hulick
  */
-angular.module('max.directives', []).directive('maxDatatables',
-    ['$timeout', '$compile'
-  , function($timeout, $compile) {
+angular.module('directives', []).directive('datatable', ['$timeout', '$compile',
+    function($timeout, $compile) {
 
         // default options to be used on to all datatables
         // custom configuration is passed through via $scope.datatables
