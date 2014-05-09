@@ -1,0 +1,32 @@
+{
+    "recordsTotal": 2,
+    "recordsFiltered": 2,
+    "data": [
+        {
+            "id": 1,
+            "jsn": "A0920",
+            "nomenclature": "Server, Computer, Blade",
+            "description": "A full height 4-socket blade server that allows deployment of large Enterprise-class applications...",
+            "price1": "$4929 Dell Computer Corp.",
+            "price2": "$5939 IBM North America",
+            "price3": "$5819 Hewlett-Packard Company",
+            "meanPrice": "$5562",
+            "status": "Active",
+            "isActive": true,
+            "lastModified": "03/04/14"
+        },
+        {
+            "id": 2,
+            "jsn": "A0921",
+            "nomenclature": "Cabinet, Server, Computer, Blade",
+            "description": "Rack enclosed cabinet for blade servers and other data center components...",
+            "price1": "$1149 Dell Computer Corp.",
+            "price2": "$3099 IBM North America",
+            "price3": "$999 Hewlett-Packard Company",
+            "meanPrice": "$1749",
+            "status": "Inactive",
+            "isActive": false,
+            "lastModified": "03/04/14"
+        }
+    ]
+}
