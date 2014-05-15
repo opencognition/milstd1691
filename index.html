@@ -323,7 +323,7 @@
     <!--<script src="js/plugin/datatables/DT_bootstrap.js"></script>-->
     <script type="text/javascript">
         // DO NOT REMOVE : GLOBAL FUNCTIONS!
-
+        
         $(document).ready(function () {
 
             pageSetUp();
@@ -338,22 +338,31 @@
                     dataTablesAjaxStartTime = new Date().getTime();
                 })
                 .on('xhr.dt', function (e, settings, json) {
+                    // Add Datatable expected json attributes.
+                    json.recordsTotal = 100; // TODO map actual value from MAX-PAAS service call meta data
+                    json.recordsFiltered = 2; // TODO map actual value from MAX-PAAS service call meta data
                     dataTablesAjaxEndTime = new Date().getTime();
                     var dataTablesAjaxDuration = dataTablesAjaxEndTime - dataTablesAjaxStartTime;
                     var recordsFiltered = json.recordsFiltered;
+                    recordsFiltered = json.results.count;
                     $('#record-count-1').html(recordsFiltered);
                     $('#record-count-2').html(recordsFiltered);
                     $('#ajax-duration').html((dataTablesAjaxDuration * .001).toFixed(2));
                 })
-                .dataTable({
+                    .dataTable({
                     "serverSide": true,
                     "processing": true,
                     "searching": true,
+                    "pageLength": 1,
+                    "lengthMenu": [1, 2, 5, 10, 25, 50],
                     "ajax": {
-                        "url": "mockdata.json",
-                        "dataSrc": "data",
+                        "url": "http://max-baas.devl.netspective.com/s/grid/data/elasticsearch/document.milstd1691/current.json",
+                        "dataSrc": "results.items",
                         "type": "GET",
                         "data": function ( d ) {
+                            // Map default paging parameters to MAX-PAAS parameter names
+                            d.startIndex = d['start'];
+                            d.count = d['length'];
                             var searchColumns = [];
                             if ($('#search-everything').prop('checked') == true) {
                                 searchColumns.push('everything');
@@ -377,21 +386,21 @@
                         }
                     },
                     "columns": [
-                        {"name": "ID",              "data": "id",           "targets": "record-id",     "visible": false},
+                        {"name": "ID",              "data": "key",           "targets": "record-id",     "visible": false},
                         {
-                            "name": "JSN Link",        "data": "jsn",          "targets": "jsn-link",
+                            "name": "JSN Link",        "data": "source.jsn",          "targets": "jsn-link",
                             "render": function (data, type, full) {
                                 return '<a href="'+data+'">' + data + '</a>';
                             }
                         },
-                        {"name": "Nomenclature",    "data": "nomenclature", "targets": "nomenclature"},
-                        {"name": "Description",     "data": "description",  "targets": "description"},
-                        {"name": "Price 1",         "data": "price1",       "targets": "price-1",       "visible": false},
-                        {"name": "Price 2",         "data": "price2",       "targets": "price-2",       "visible": false},
-                        {"name": "Price 3",         "data": "price3",       "targets": "price-3",       "visible": false},
-                        {"name": "Mean Price",      "data": "meanPrice",    "targets": "mean-price"},
+                        {"name": "Nomenclature",    "data": "source.nomenclature", "targets": "nomenclature"},
+                        {"name": "Description",     "data": "source.description",  "targets": "description"},
+                        {"name": "Price 1",         "data": "source.price1",       "targets": "price-1",       "visible": false},
+                        {"name": "Price 2",         "data": "source.price2",       "targets": "price-2",       "visible": false},
+                        {"name": "Price 3",         "data": "source.price3",       "targets": "price-3",       "visible": false},
+                        {"name": "Mean Price",      "data": "source.meanPrice",    "targets": "mean-price"},
                         {
-                            "name": "Status",          "data": "isActive",       "targets": "status",   "visible": false,
+                            "name": "Status",          "data": "source.isActive",       "targets": "status",   "visible": false,
                             "render": function (data, type, full) {
                                 if (data == true) {
                                     return '<span ng-class="{\'label label-success\': row.isActive, \'label label-danger\': !row.isActive}" class="ng-binding label label-success">Active</span>';
@@ -401,7 +410,7 @@
                                 }
                             }
                         },
-                        {"name": "Last Modified",   "data": "lastModified", "targets": "last-modified"}
+                        {"name": "Last Modified",   "data": "source.lastModified", "targets": "last-modified"}
                     ],
                     "dom": 'C<"clear">T<"clear">lfrtip',
                     "colVis": {
